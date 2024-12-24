@@ -1,0 +1,3 @@
+3. Customizing Salesforce ORG with Company Branding 
+-> Uploaded & Applied the Logo + Custom Color Theme. 
+-> Created a New App called PharmaForce.
