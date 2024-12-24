@@ -1,0 +1,16 @@
+1. Setting Up the Git Repo & Branch Management
+-> Created a new project locally -- SFDX: Create Project with Manifest.
+-> Authenticated the Org -- SFDX: Authenticate an Org.
+-> Created a new repository in GitHub: PharmaForce.
+-> In the terminal, in the project directory:
+    git init /*initialized the directry as a Git repository*/
+->  git remote add origin https://github.com/bgemil/PharmaForce.git
+->  git remote -v 
+        /*should output: origin https://github.com/bgemil/PharmaForce.git (fetch)
+                         origin https://github.com/bgemil/PharmaForce.git (push) */
+-> git add . /*staged the changes*/
+-> git commit -m "Initial commit" 
+-> git branch -M main
+   git push -u origin main
+-> Created a new branch, "feature/ONBD-41", corresponding to the current Jira ticket.
+-> Added this description file.
