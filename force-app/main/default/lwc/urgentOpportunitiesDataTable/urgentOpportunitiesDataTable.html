@@ -1,0 +1,58 @@
+<template>
+    <lightning-card title="Urgent Opportunities"> 
+        <!-- HEADER -->
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium header-container">
+            <lightning-input
+                    class="search-input"
+                    type="search"
+                    onchange={handleSearch}
+            ></lightning-input> 
+            <lightning-button
+                    label="New Opportunity"
+                    class="new-opportunity-button"
+                    onclick={handleNewOpportunity}
+            ></lightning-button>                 
+        </div>
+
+        <!-- DATATABLE -->
+        <div class="datatable-container">
+            <lightning-datatable
+                key-field="Id"
+                data={opportunities}
+                columns={columns}
+                hide-checkbox-column
+            ></lightning-datatable>
+        </div>
+
+        <!-- PAGINATION -->
+        <template if:true={isDataReadyForPagination}>
+            <div class="pagination-section">
+                <lightning-button
+                    label="Previous"
+                    onclick={handlePrevious}
+                    disabled={disablePrevious}
+                ></lightning-button>
+    
+                <div class="pagination-numbers">
+                    <template for:each={pageClassMap} for:item="page">
+                        <button
+                            key={page.number}
+                            class={page.class}
+                            onclick={handlePageClick}
+                            data-page={page.number}
+                        >
+                            {page.number}
+                        </button>
+                    </template>                               
+                </div>
+                
+                <lightning-button
+                    label="Next"
+                    onclick={handleNext}
+                    disabled={disableNext}
+                ></lightning-button>
+            </div>
+        </template>        
+        <c-create-urgent-opportunity if:true={isModalOpen} onsave={handleModalSave} oncancel={handleModalCancel}></c-create-urgent-opportunity>
+    </lightning-card>
+</template>

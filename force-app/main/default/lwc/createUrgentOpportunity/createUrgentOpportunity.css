@@ -1,0 +1,18 @@
+.slds-modal__content lightning-input,
+.slds-modal__content lightning-combobox {
+  margin-bottom: 1rem; /* Add spacing between inputs */
+  margin-left: 1rem;   /* Add left spacing from the container */
+  margin-right: 1rem;  /* Add right spacing from the container */
+}
+
+.slds-modal__content {
+  padding-top: 1rem;   /* Optional: Add padding at the top */
+  padding-bottom: 1rem; /* Optional: Add padding at the bottom */
+}
+
+.slds-modal__footer {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 1rem; /* Space between Cancel and Save buttons */
+}
+
