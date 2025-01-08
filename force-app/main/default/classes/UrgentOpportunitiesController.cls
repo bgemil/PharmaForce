@@ -21,7 +21,7 @@ public with sharing class UrgentOpportunitiesController {
             ];
         } catch (Exception e) {
             ErrorHandler.logError(e, 'UrgentOpportunitiesController', 'fetchUrgentOpportunities', 'ERROR');
-            throw new AuraHandledException('An error occurred while fetching opportunities.');
+            throw new QueryException('An error occurred while fetching opportunities.');
         }
     }
 
