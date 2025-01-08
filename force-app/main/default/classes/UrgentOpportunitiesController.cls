@@ -6,7 +6,7 @@ public with sharing class UrgentOpportunitiesController {
     public static List<Opportunity> fetchUrgentOpportunities(String searchKey, Id accountId, Integer offset, Integer limitValue) {
         try {
             if (forceFailure) { // Simulate exception during tests
-                throw new QueryException('Simulated query failure');
+                throw new AuraHandledException('Simulated query failure');
             }
 
             String searchFilter = (searchKey == null) ? '%' : '%' + searchKey + '%';
@@ -29,7 +29,7 @@ public with sharing class UrgentOpportunitiesController {
     public static Integer fetchTotalRecordCount(String searchKey, Id accountId) {
         try {
             if (forceFailure) { // Simulate exception during tests
-                throw new QueryException('Simulated query failure');
+                throw new AuraHandledException('Simulated query failure');
             }
 
             String searchFilter = (searchKey == null) ? '%' : '%' + searchKey + '%';
@@ -47,18 +47,21 @@ public with sharing class UrgentOpportunitiesController {
     }
 
     @AuraEnabled
-    public static void saveNewOpportunity(Opportunity opportunity) {
+    public static Boolean saveNewOpportunity(Opportunity opportunity) {
+        Boolean isSuccess = true;
         try {
             if (forceFailure && Test.isRunningTest()) { // Simulate exception during tests
                 Database.insert(opportunity, false);
-                throw new DmlException('Simulated DML failure');
+                throw new AuraHandledException('Simulated DML failure');
             }
 
             insert opportunity;
         } catch (Exception e) {
             System.debug('Exception caught in saveNewOpportunity: ' + e.getMessage());
             ErrorHandler.logError(e, 'UrgentOpportunitiesController', 'saveNewOpportunity', 'ERROR');
-            throw new AuraHandledException('An error occurred while saving the opportunity. Please try again later.');
+            // throw new AuraHandledException('An error occurred while saving the opportunity. Please try again later.');
+            isSuccess = false;
         }
+        return isSuccess;
     }
 }
