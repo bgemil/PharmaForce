@@ -43,32 +43,34 @@ export default class CreateUrgentOpportunity extends LightningElement {
         let firstInvalidField = null;
 
         inputs.forEach((input) => {
+            const field = input.dataset.field;
+
             if (!input.value) {
                 isValid = false;
-
                 input.setCustomValidity('This field is required');
-                input.reportValidity();
 
                 if (!firstInvalidField) {
                     firstInvalidField = input;
                 }
             } else {
-                if (field === 'amount' && isNaN(input.value)) {
-                    isValid = false;
-                    input.setCustomValidity('Amount must be a number');
-                    input.reportValidity();
-                } else if (field === 'amount' && input.value <= 0) {
-                    isValid = false;
-                    input.setCustomValidity('Amount must be greater than zero');
-                    input.reportValidity();
-                } else if (field === 'closeDate' && new Date(input.value) < new Date()) {
-                    isValid = false;
-                    input.setCustomValidity('Close Date cannot be in the past');
-                    input.reportValidity();
-                } else {
-                    input.setCustomValidity(''); 
+                input.setCustomValidity('');
+                if (field === 'amount') {
+                    if (isNaN(input.value)) {
+                        isValid = false;
+                        input.setCustomValidity('Amount must be a number');
+                    } else if (input.value <= 0) {
+                        isValid = false;
+                        input.setCustomValidity('Amount must be greater than zero');
+                    }
+                } else if (field === 'closeDate') {
+                    if (new Date(input.value) < new Date()) {
+                        isValid = false;
+                        input.setCustomValidity('Close Date cannot be in the past');
+                    }
                 }
             }
+
+            input.reportValidity();
 
             if (!isValid && !firstInvalidField) {
                 firstInvalidField = input; 
