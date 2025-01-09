@@ -13,15 +13,13 @@ export default class CreateUrgentOpportunity extends LightningElement {
     @track stageOptions = []; 
     @track error; 
 
-    // Fetch metadata about the Opportunity object
     @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
     opportunityInfo;
 
-    // Fetch picklist values for the StageName field
     @wire(getPicklistValues, { recordTypeId: '$opportunityInfo.data.defaultRecordTypeId', fieldApiName: STAGE_FIELD })
     wiredStageOptions({ error, data }) {
         if (data) {
-            this.stageOptions = data.values; // Populate stageOptions with picklist values
+            this.stageOptions = data.values; 
             this.error = undefined;
         } else if (error) {
             this.error = error;
@@ -68,12 +66,12 @@ export default class CreateUrgentOpportunity extends LightningElement {
                     input.setCustomValidity('Close Date cannot be in the past');
                     input.reportValidity();
                 } else {
-                    input.setCustomValidity(''); // Clear any previous errors
+                    input.setCustomValidity(''); 
                 }
             }
 
             if (!isValid && !firstInvalidField) {
-                firstInvalidField = input; // Capture the first invalid field
+                firstInvalidField = input; 
             }
         });
 
