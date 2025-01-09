@@ -10,8 +10,8 @@ export default class CreateUrgentOpportunity extends LightningElement {
     @track amount = null;
     @track closeDate = null;
 
-    @track stageOptions = []; // Dynamically loaded stage options
-    @track error; // To capture errors
+    @track stageOptions = []; 
+    @track error; 
 
     // Fetch metadata about the Opportunity object
     @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
@@ -40,45 +40,42 @@ export default class CreateUrgentOpportunity extends LightningElement {
     }
 
     handleSave() {
-        // Check for null or undefined values
-        // if (!this.opportunityName) {
-        //     console.error('Missing opportunityName.');
-        //     return;
-        // } else if (!this.stageName) {
-        //     console.error('Missing stageName.');
-        //     return;
-        // } else if (!this.amount) {
-        //     console.error('Missing amount.');
-        //     return;
-        // } else if (!this.closeDate) {
-        //     console.error('Missing closeDate.');
-        //     return;
-        // }
-
         const inputs = this.template.querySelectorAll('lightning-input, lightning-combobox');
         let isValid = true;
         let firstInvalidField = null;
 
         inputs.forEach((input) => {
-            // Check if the input is required and empty
             if (!input.value) {
                 isValid = false;
 
-                // Show error message for invalid fields
                 input.setCustomValidity('This field is required');
                 input.reportValidity();
 
-                // Focus on the first invalid field
                 if (!firstInvalidField) {
                     firstInvalidField = input;
                 }
             } else {
-                // Clear any previous error messages
-                input.setCustomValidity('');
+                if (field === 'amount' && isNaN(input.value)) {
+                    isValid = false;
+                    input.setCustomValidity('Amount must be a number');
+                } else if (field === 'amount' && input.value <= 0) {
+                    isValid = false;
+                    input.setCustomValidity('Amount must be greater than zero');
+                } else if (field === 'closeDate' && new Date(input.value) < new Date()) {
+                    isValid = false;
+                    input.setCustomValidity('Close Date cannot be in the past');
+                } else {
+                    input.setCustomValidity(''); // Clear any previous errors
+                }
+            }
+
+            input.reportValidity(); // Display error message
+
+            if (!isValid && !firstInvalidField) {
+                firstInvalidField = input; // Capture the first invalid field
             }
         });
 
-        // Focus on the first invalid field
         if (!isValid) {
             firstInvalidField.focus();
             return;
