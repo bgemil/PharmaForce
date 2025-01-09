@@ -58,18 +58,19 @@ export default class CreateUrgentOpportunity extends LightningElement {
                 if (field === 'amount' && isNaN(input.value)) {
                     isValid = false;
                     input.setCustomValidity('Amount must be a number');
+                    input.reportValidity();
                 } else if (field === 'amount' && input.value <= 0) {
                     isValid = false;
                     input.setCustomValidity('Amount must be greater than zero');
+                    input.reportValidity();
                 } else if (field === 'closeDate' && new Date(input.value) < new Date()) {
                     isValid = false;
                     input.setCustomValidity('Close Date cannot be in the past');
+                    input.reportValidity();
                 } else {
                     input.setCustomValidity(''); // Clear any previous errors
                 }
             }
-
-            input.reportValidity(); // Display error message
 
             if (!isValid && !firstInvalidField) {
                 firstInvalidField = input; // Capture the first invalid field
