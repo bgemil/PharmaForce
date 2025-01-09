@@ -40,7 +40,8 @@ export default class UrgentOpportunitiesTable extends LightningElement {
             return;
         }
 
-        fetchUrgentOpportunities({ searchKey: this.searchKey, accountId: this.recordId, offset: this.offset, limitValue: this.limitValue })
+        fetchUrgentOpportunities({ searchKey: this.searchKey, accountId: this.recordId, offset: this.offset, 
+                                    limitValue: this.limitValue })
             .then(result => {
                 this.opportunities = result;
             })
