@@ -162,10 +162,14 @@ export default class UrgentOpportunitiesTable extends LightningElement {
         }
 
         saveNewOpportunity({ opportunity: newOpportunity })
-            .then(() => {
+            .then((result) => {
                 this.isModalOpen = false;
                 this.loadOpportunities();
-                this.showToast('Success', 'New urgent opportunity created!', 'success');
+                if(result) {
+                    this.showToast('Success', 'New urgent opportunity created!', 'success');
+                } else {
+                    this.showToast('False', 'Problem in creating urgent opportunity', 'error');
+                }
             })
             .catch(function (error) {
                 let errorMessage = 'An unexpected error occurred.';
