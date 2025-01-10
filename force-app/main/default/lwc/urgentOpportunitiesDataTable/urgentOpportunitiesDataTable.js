@@ -2,7 +2,6 @@ import { LightningElement, api, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 import fetchUrgentOpportunities from '@salesforce/apex/UrgentOpportunitiesController.fetchUrgentOpportunities';
-import fetchTotalRecordCount from '@salesforce/apex/UrgentOpportunitiesController.fetchTotalRecordCount';
 import saveNewOpportunity from '@salesforce/apex/UrgentOpportunitiesController.saveNewOpportunity';
 
 export default class UrgentOpportunitiesTable extends LightningElement {
