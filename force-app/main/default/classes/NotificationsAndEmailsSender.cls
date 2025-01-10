@@ -1,7 +1,7 @@
 public with sharing class NotificationsAndEmailsSender {
     public static void processOpportunities(List<Opportunity> opportunities) {
         try {
-            // Fetch notification type ID once
+            // Fetching notification type ID once
             CustomNotificationType oppNotificationType = [ 
                 SELECT Id 
                 FROM CustomNotificationType 
@@ -24,7 +24,7 @@ public with sharing class NotificationsAndEmailsSender {
                         ] != null;
                     }
 
-                    // Notify creator
+                    // Notifying creator
                     if (isCreatorInTeam) {
                         sendNotificationsAndEmails(
                             opportunity,
@@ -35,7 +35,7 @@ public with sharing class NotificationsAndEmailsSender {
                         );
                     }
 
-                    // Notify team members
+                    // Notifying team members
                     if (opportunity.AccountId != null) {
                         List<AccountTeamMember> teamMembers = [
                             SELECT UserId 
@@ -56,7 +56,7 @@ public with sharing class NotificationsAndEmailsSender {
                 }
             }
 
-            // Send all emails in bulk
+            // Sending all emails in bulk
             if (!emailMessages.isEmpty()) {
                 Messaging.sendEmail(emailMessages);
             }

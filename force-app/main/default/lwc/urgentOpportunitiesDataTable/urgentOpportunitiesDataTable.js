@@ -27,8 +27,8 @@ export default class UrgentOpportunitiesTable extends LightningElement {
     })
     wiredOpportunitiesWithCount({ error, data }) {
         if (data) {
-            this.opportunities = data.opportunities; // Populate the opportunities
-            this.totalRecords = data.totalRecords;   // Populate the total record count
+            this.opportunities = data.opportunities; 
+            this.totalRecords = data.totalRecords;   
         } else if (error) {
             this.opportunities = [];
             this.totalRecords = 0;
@@ -37,10 +37,9 @@ export default class UrgentOpportunitiesTable extends LightningElement {
         }
     }
 
-    // Handle search input
     handleSearch(event) {
-        this.searchKey = event.target.value; // Update searchKey
-        this.offset = 0; // Reset pagination
+        this.searchKey = event.target.value; 
+        this.offset = 0; 
     }
 
     // Pagination
@@ -68,7 +67,6 @@ export default class UrgentOpportunitiesTable extends LightningElement {
         const currentPage = this.currentPage;
     
         if (totalPages <= 0) {
-            console.log('No pages to display.');
             return [];
         }
     

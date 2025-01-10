@@ -2,7 +2,6 @@
 public class NotificationsAndEmailsSenderTest {
     @testSetup
     static void setupTestData() {
-        // Create a test user with a System Administrator profile
         Profile adminProfile = [SELECT Id FROM Profile WHERE Name = 'System Administrator' LIMIT 1];
         User testUser = new User(
             FirstName = 'Test',
@@ -18,11 +17,9 @@ public class NotificationsAndEmailsSenderTest {
         );
         insert testUser;
 
-        // Create a test account
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
 
-        // Create opportunities
         Opportunity opp1 = new Opportunity(
             Name = 'Urgent Opportunity',
             StageName = 'Prospecting',
@@ -42,7 +39,6 @@ public class NotificationsAndEmailsSenderTest {
         );
         insert opp2;
 
-        // Create an account team member
         AccountTeamMember teamMember = new AccountTeamMember(
             AccountId = testAccount.Id,
             UserId = testUser.Id,
@@ -53,10 +49,9 @@ public class NotificationsAndEmailsSenderTest {
 
     @isTest
     static void testProcessOpportunities_WithAccountTeam() {
-        // Retrieve test data
         List<Opportunity> opps = [SELECT Id, Name, AccountId FROM Opportunity WHERE AccountId != null];
 
-        // Run as the test user
+        // Running as the test user
         User testUser = [SELECT Id FROM User WHERE Alias = 'testusr' LIMIT 1];
         System.runAs(testUser) {
             Test.startTest();
@@ -109,11 +104,11 @@ public class NotificationsAndEmailsSenderTest {
             Test.startTest();
             try {
                 NotificationsAndEmailsSender.sendNotificationsAndEmails(
-                    null, // Invalid Opportunity
-                    null, // Invalid UserId
+                    null,
+                    null, 
                     true,
-                    null, // Invalid NotificationTypeId
-                    null  // Invalid EmailMessage List
+                    null, 
+                    null 
                 );
             } catch (Exception e) {
                 System.assert(e != null, 'Error should be caught in sendNotificationsAndEmails.');

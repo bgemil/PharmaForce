@@ -5,7 +5,6 @@ import OPPORTUNITY_OBJECT from '@salesforce/schema/Opportunity';
 import STAGE_FIELD from '@salesforce/schema/Opportunity.StageName';
 
 export default class CreateUrgentOpportunity extends LightningElement {
-    // track de sters
     opportunityName = '';
     stageName = '';
     amount = null;
