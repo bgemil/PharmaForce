@@ -9,7 +9,6 @@ public with sharing class NotificationsAndEmailsSender {
                 LIMIT 1
             ];
 
-            // Collect all Account IDs and Opportunity Creator IDs
             Set<Id> accountIds = new Set<Id>();
             Set<Id> creatorIds = new Set<Id>();
             for (Opportunity opportunity : opportunities) {
@@ -21,7 +20,6 @@ public with sharing class NotificationsAndEmailsSender {
                 }
             }
 
-            // Query all AccountTeamMember records for the relevant Accounts
             Map<Id, List<AccountTeamMember>> accountTeamMembersMap = new Map<Id, List<AccountTeamMember>>();
             for (AccountTeamMember member : [
                 SELECT AccountId, UserId
@@ -34,31 +32,28 @@ public with sharing class NotificationsAndEmailsSender {
                 accountTeamMembersMap.get(member.AccountId).add(member);
             }
 
-            // Query all relevant Users
             Map<Id, User> userMap = new Map<Id, User>([
                 SELECT Id, Email
                 FROM User
                 WHERE Id IN :creatorIds
             ]);
 
-            // Prepare email messages
             List<Messaging.SingleEmailMessage> emailMessages = new List<Messaging.SingleEmailMessage>();
 
             for (Opportunity opportunity : opportunities) {
                 if (opportunity.Urgent__c == true) {
                     Boolean isCreatorInTeam = false;
 
-                    // Check if the creator is in the account team using a loop
                     if (opportunity.AccountId != null && accountTeamMembersMap.containsKey(opportunity.AccountId)) {
                         for (AccountTeamMember member : accountTeamMembersMap.get(opportunity.AccountId)) {
                             if (member.UserId == opportunity.CreatedById) {
                                 isCreatorInTeam = true;
-                                break; // Exit the loop as soon as a match is found
+                                break; 
                             }
                         }
                     }
 
-                    // Notify creator
+                    // Notifying creator
                     if (isCreatorInTeam) {
                         sendNotificationsAndEmails(
                             opportunity,
@@ -70,7 +65,7 @@ public with sharing class NotificationsAndEmailsSender {
                         );
                     }
 
-                    // Notify team members
+                    // Notifying team members
                     if (opportunity.AccountId != null && accountTeamMembersMap.containsKey(opportunity.AccountId)) {
                         for (AccountTeamMember member : accountTeamMembersMap.get(opportunity.AccountId)) {
                             if (member.UserId != opportunity.CreatedById) {
@@ -88,7 +83,6 @@ public with sharing class NotificationsAndEmailsSender {
                 }
             }
 
-            // Send all emails in bulk
             if (!emailMessages.isEmpty()) {
                 Messaging.sendEmail(emailMessages);
             }
@@ -111,7 +105,7 @@ public with sharing class NotificationsAndEmailsSender {
                         ? 'You’ve successfully created the ' + opportunity.Name + ' urgent opportunity. '
                         : 'User ' + UserInfo.getName() + ' created a new urgent opportunity: ' + opportunity.Name;
 
-                    // Send Salesforce notification
+                    // Sending Salesforce notification
                     Messaging.CustomNotification notification = new Messaging.CustomNotification();
                     notification.setBody(notificationBody);
                     notification.setTitle(notificationTitle);
@@ -120,7 +114,6 @@ public with sharing class NotificationsAndEmailsSender {
                     notification.setTargetId(recipientId);
                     notification.send(new Set<String>{String.valueOf(recipientId)});
 
-                    // Prepare email
                     Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                     email.setToAddresses(new List<String>{recipient.Email});
                     email.setSubject(notificationTitle);

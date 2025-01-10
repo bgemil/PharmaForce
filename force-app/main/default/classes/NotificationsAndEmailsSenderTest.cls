@@ -20,38 +20,39 @@ public class NotificationsAndEmailsSenderTest {
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
 
-        Opportunity opp1 = new Opportunity(
-            Name = 'Urgent Opportunity',
-            StageName = 'Prospecting',
-            CloseDate = Date.today().addDays(10),
-            Amount = 1000,
-            Urgent__c = true,
-            AccountId = testAccount.Id
-        );
-        insert opp1;
+        System.runAs(testUser) {
+            Opportunity opp1 = new Opportunity(
+                Name = 'Urgent Opportunity',
+                StageName = 'Prospecting',
+                CloseDate = Date.today().addDays(10),
+                Amount = 1000,
+                Urgent__c = true,
+                AccountId = testAccount.Id
+            );
+            insert opp1;
 
-        Opportunity opp2 = new Opportunity(
-            Name = 'No Account Opportunity',
-            StageName = 'Qualification',
-            CloseDate = Date.today().addDays(15),
-            Amount = 2000,
-            Urgent__c = true
-        );
-        insert opp2;
+            Opportunity opp2 = new Opportunity(
+                Name = 'No Account Opportunity',
+                StageName = 'Qualification',
+                CloseDate = Date.today().addDays(15),
+                Amount = 2000,
+                Urgent__c = true
+            );
+            insert opp2;
 
-        AccountTeamMember teamMember = new AccountTeamMember(
-            AccountId = testAccount.Id,
-            UserId = testUser.Id,
-            TeamMemberRole = 'Sales Team'
-        );
-        insert teamMember;
+            AccountTeamMember teamMember = new AccountTeamMember(
+                AccountId = testAccount.Id,
+                UserId = testUser.Id,
+                TeamMemberRole = 'Sales Team'
+            );
+            insert teamMember;
+        }
     }
 
     @isTest
     static void testProcessOpportunities_WithAccountTeam() {
-        List<Opportunity> opps = [SELECT Id, Name, AccountId FROM Opportunity WHERE AccountId != null];
+        List<Opportunity> opps = [SELECT Id, Name, AccountId, Urgent__c, CreatedById FROM Opportunity WHERE AccountId != null];
 
-        // Running as the test user
         User testUser = [SELECT Id FROM User WHERE Alias = 'testusr' LIMIT 1];
         System.runAs(testUser) {
             Test.startTest();
@@ -59,12 +60,12 @@ public class NotificationsAndEmailsSenderTest {
             Test.stopTest();
         }
 
-        System.assert(true, 'Opportunities processed successfully.');
+        Assert.isTrue(true, 'Opportunities processed successfully.');
     }
 
     @isTest
     static void testProcessOpportunities_WithoutAccountId() {
-        Opportunity opp = [SELECT Id, Name FROM Opportunity WHERE AccountId = null LIMIT 1];
+        Opportunity opp = [SELECT Id, Name, AccountId, Urgent__c, CreatedById FROM Opportunity WHERE AccountId = null LIMIT 1];
 
         User testUser = [SELECT Id FROM User WHERE Alias = 'testusr' LIMIT 1];
         System.runAs(testUser) {
@@ -73,13 +74,15 @@ public class NotificationsAndEmailsSenderTest {
             Test.stopTest();
         }
 
-        System.assert(true, 'Opportunities without AccountId processed successfully.');
+        Assert.isTrue(true, 'Opportunities without AccountId processed successfully.');
     }
 
     @isTest
     static void testSendNotificationsAndEmails() {
-        Opportunity opp = [SELECT Id, Name, AccountId FROM Opportunity WHERE AccountId != null LIMIT 1];
+        Opportunity opp = [SELECT Id, Name, AccountId, Amount, CloseDate FROM Opportunity WHERE AccountId != null LIMIT 1];
         User testUser = [SELECT Id, Email FROM User WHERE Alias = 'testusr' LIMIT 1];
+        Map<Id, User> userMap = new Map<Id, User>([SELECT Id, Email FROM User WHERE Id IN :new Set<Id>{testUser.Id}]);
+        List<Messaging.SingleEmailMessage> emailMessages = new List<Messaging.SingleEmailMessage>();
 
         System.runAs(testUser) {
             Test.startTest();
@@ -88,17 +91,20 @@ public class NotificationsAndEmailsSenderTest {
                 testUser.Id,
                 true, // isCreator
                 'notificationTypeId',
-                new List<Messaging.SingleEmailMessage>()
+                emailMessages,
+                userMap
             );
             Test.stopTest();
         }
 
-        System.assert(true, 'Notifications and emails sent successfully.');
+        Assert.isTrue(!emailMessages.isEmpty(), 'Emails should be added to the list.');
     }
 
     @isTest
     static void testSendNotificationsAndEmails_ErrorHandling() {
         User testUser = [SELECT Id FROM User WHERE Alias = 'testusr' LIMIT 1];
+        List<Messaging.SingleEmailMessage> emailMessages = new List<Messaging.SingleEmailMessage>();
+        Map<Id, User> userMap = new Map<Id, User>();
 
         System.runAs(testUser) {
             Test.startTest();
@@ -106,12 +112,13 @@ public class NotificationsAndEmailsSenderTest {
                 NotificationsAndEmailsSender.sendNotificationsAndEmails(
                     null,
                     null, 
-                    true,
+                    true, 
                     null, 
-                    null 
+                    emailMessages,
+                    userMap
                 );
             } catch (Exception e) {
-                System.assert(e != null, 'Error should be caught in sendNotificationsAndEmails.');
+                Assert.isNotNull(e, 'Error should be caught in sendNotificationsAndEmails.');
             }
             Test.stopTest();
         }

@@ -39,8 +39,8 @@ public class UrgentOpportunitiesControllerTest {
         );
         Test.stopTest();
 
-        System.assert(response != null, 'Response should not be null.');
-        System.assert(response.opportunities.size() > 0, 'Should fetch urgent opportunities.');
+        Assert.isNotNull(response, 'Response should not be null.');
+        Assert.isTrue(response.opportunities.size() > 0, 'Should fetch urgent opportunities.');
     }
 
     @isTest
@@ -49,7 +49,7 @@ public class UrgentOpportunitiesControllerTest {
         try {
             UrgentOpportunitiesController.fetchUrgentOpportunities(null, null, 0, 10);
         } catch (Exception e) {
-            System.assert(e.getMessage() != null, 'Catch block should handle null parameters.');
+            Assert.isNotNull(e.getMessage(), 'Catch block should handle null parameters.');
         }
         Test.stopTest();
     }
@@ -66,7 +66,7 @@ public class UrgentOpportunitiesControllerTest {
         Boolean isSuccess = UrgentOpportunitiesController.saveNewOpportunity(opp);
         Test.stopTest();
 
-        System.assert(isSuccess, 'Opportunity should be saved successfully.');
+        Assert.isTrue(isSuccess, 'Opportunity should be saved successfully.');
     }
 
     @isTest
@@ -75,7 +75,7 @@ public class UrgentOpportunitiesControllerTest {
         try {
             UrgentOpportunitiesController.saveNewOpportunity(null);
         } catch (Exception e) {
-            System.assert(e.getMessage() != null, 'Catch block should handle null opportunity.');
+            Assert.isNotNull(e.getMessage(), 'Catch block should handle null opportunity.');
         }
         Test.stopTest();
     }

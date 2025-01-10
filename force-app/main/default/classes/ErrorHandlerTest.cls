@@ -23,12 +23,12 @@ public class ErrorHandlerTest {
                                        AND MethodName__c = 'testLogError'
                                        LIMIT 1];
            
-            System.assert(loggedError != null, 'Error log should be created.');
-            System.assert(loggedError.ClassName__c == 'ErrorHandlerTest', 'Class name should match.');
-            System.assert(loggedError.MethodName__c == 'testLogError', 'Method name should match.');
-            System.assert(loggedError.Level__c == 'ERROR', 'Error level should match.');
-            System.assert(loggedError.Message__c != null, 'Message should not be null.');
-            System.assert(loggedError.StackTrace__c != null, 'Stack trace should not be null.');
+            Assert.isNotNull(loggedError, 'Error log should be created.');
+            Assert.areEqual('ErrorHandlerTest', loggedError.ClassName__c, 'Class name should match.');
+            Assert.areEqual('testLogError', loggedError.MethodName__c, 'Method name should match.');
+            Assert.areEqual('ERROR', loggedError.Level__c, 'Error level should match.');
+            Assert.isNotNull(loggedError.Message__c, 'Message should not be null.');
+            Assert.isNotNull(loggedError.StackTrace__c, 'Stack trace should not be null.');
         }
     }
 }
