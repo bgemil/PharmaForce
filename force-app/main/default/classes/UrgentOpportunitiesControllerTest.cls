@@ -41,7 +41,7 @@ private class UrgentOpportunitiesControllerTest {
     // Test fetchUrgentOpportunities exception handling
     @isTest
     static void testFetchUrgentOpportunities_Exception() {
-        UrgentOpportunitiesController.forceFailure = true; // Enable simulated failure
+        UrgentOpportunitiesController.forceFailure = true;
         Test.startTest();
         try {
             UrgentOpportunitiesController.fetchUrgentOpportunities(null, null, 0, 10);
@@ -59,7 +59,7 @@ private class UrgentOpportunitiesControllerTest {
     // Test fetchTotalRecordCount exception handling
     @isTest
     static void testFetchTotalRecordCount_Exception() {
-        UrgentOpportunitiesController.forceFailure = true; // Enable simulated failure
+        UrgentOpportunitiesController.forceFailure = true;
         Test.startTest();
         try {
             // Force failure

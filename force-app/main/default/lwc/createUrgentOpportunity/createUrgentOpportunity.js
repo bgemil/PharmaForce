@@ -13,15 +13,13 @@ export default class CreateUrgentOpportunity extends LightningElement {
     @track stageOptions = []; 
     @track error; 
 
-    // Fetch metadata about the Opportunity object
     @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
     opportunityInfo;
 
-    // Fetch picklist values for the StageName field
     @wire(getPicklistValues, { recordTypeId: '$opportunityInfo.data.defaultRecordTypeId', fieldApiName: STAGE_FIELD })
     wiredStageOptions({ error, data }) {
         if (data) {
-            this.stageOptions = data.values; // Populate stageOptions with picklist values
+            this.stageOptions = data.values; 
             this.error = undefined;
         } else if (error) {
             this.error = error;
@@ -45,34 +43,37 @@ export default class CreateUrgentOpportunity extends LightningElement {
         let firstInvalidField = null;
 
         inputs.forEach((input) => {
+            const field = input.dataset.field;
+
             if (!input.value) {
                 isValid = false;
-
                 input.setCustomValidity('This field is required');
-                input.reportValidity();
 
                 if (!firstInvalidField) {
                     firstInvalidField = input;
                 }
             } else {
-                if (field === 'amount' && isNaN(input.value)) {
-                    isValid = false;
-                    input.setCustomValidity('Amount must be a number');
-                } else if (field === 'amount' && input.value <= 0) {
-                    isValid = false;
-                    input.setCustomValidity('Amount must be greater than zero');
-                } else if (field === 'closeDate' && new Date(input.value) < new Date()) {
-                    isValid = false;
-                    input.setCustomValidity('Close Date cannot be in the past');
-                } else {
-                    input.setCustomValidity(''); // Clear any previous errors
+                input.setCustomValidity('');
+                if (field === 'amount') {
+                    if (isNaN(input.value)) {
+                        isValid = false;
+                        input.setCustomValidity('Amount must be a number');
+                    } else if (input.value <= 0) {
+                        isValid = false;
+                        input.setCustomValidity('Amount must be greater than zero');
+                    }
+                } else if (field === 'closeDate') {
+                    if (new Date(input.value) < new Date()) {
+                        isValid = false;
+                        input.setCustomValidity('Close Date cannot be in the past');
+                    }
                 }
             }
 
-            input.reportValidity(); // Display error message
+            input.reportValidity();
 
             if (!isValid && !firstInvalidField) {
-                firstInvalidField = input; // Capture the first invalid field
+                firstInvalidField = input; 
             }
         });
 
