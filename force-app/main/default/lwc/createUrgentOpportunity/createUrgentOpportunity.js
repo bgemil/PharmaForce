@@ -1,17 +1,18 @@
-import { LightningElement, wire, track } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import OPPORTUNITY_OBJECT from '@salesforce/schema/Opportunity';
 import STAGE_FIELD from '@salesforce/schema/Opportunity.StageName';
 
 export default class CreateUrgentOpportunity extends LightningElement {
-    @track opportunityName = '';
-    @track stageName = '';
-    @track amount = null;
-    @track closeDate = null;
+    // track de sters
+    opportunityName = '';
+    stageName = '';
+    amount = null;
+    closeDate = null;
 
-    @track stageOptions = []; 
-    @track error; 
+    stageOptions = []; 
+    error; 
 
     @wire(getObjectInfo, { objectApiName: OPPORTUNITY_OBJECT })
     opportunityInfo;

@@ -138,7 +138,6 @@ export default class UrgentOpportunitiesTable extends LightningElement {
                 ]);
             })
             .catch((error) => {
-                this.showToast('Error', 'Failed to create opportunity.', 'error');
                 console.error('Error saving opportunity:', error);
             });
     }
