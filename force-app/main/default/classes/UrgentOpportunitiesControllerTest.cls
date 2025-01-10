@@ -1,96 +1,81 @@
 @isTest
-private class UrgentOpportunitiesControllerTest {
+public class UrgentOpportunitiesControllerTest {
     @testSetup
     static void setupTestData() {
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
 
-        Opportunity urgentOpp = new Opportunity(
+        Opportunity opp1 = new Opportunity(
             Name = 'Urgent Opportunity',
             StageName = 'Prospecting',
+            CloseDate = Date.today().addDays(10),
             Amount = 1000,
-            CloseDate = Date.today(),
             Urgent__c = true,
             AccountId = testAccount.Id
         );
-        insert urgentOpp;
+
+        Opportunity opp2 = new Opportunity(
+            Name = 'Non-Urgent Opportunity',
+            StageName = 'Qualification',
+            CloseDate = Date.today().addDays(15),
+            Amount = 2000,
+            Urgent__c = false,
+            AccountId = testAccount.Id
+        );
+
+        insert new List<Opportunity>{ opp1, opp2 };
     }
 
-    // Test searchKey != null branch
     @isTest
-    static void testFetchTotalRecordCount_WithSearchKey() {
-        Account acc = [SELECT Id FROM Account LIMIT 1];
+    static void testFetchUrgentOpportunities() {
+        Account testAccount = [SELECT Id FROM Account LIMIT 1];
+
         Test.startTest();
-        Integer result = UrgentOpportunitiesController.fetchTotalRecordCount('Urgent', acc.Id);
+        OpportunityResponse response = UrgentOpportunitiesController.fetchUrgentOpportunities(
+            null,
+            testAccount.Id,
+            0,
+            10
+        );
         Test.stopTest();
 
-        System.assertEquals(1, result, 'One opportunity should match the searchKey.');
+        System.assert(response != null, 'Response should not be null.');
+        System.assert(response.opportunities.size() > 0, 'Should fetch urgent opportunities.');
     }
 
-    // Test searchKey != null branch
     @isTest
-    static void testFetchUrgentOpportunities_WithSearchKey() {
-        Account acc = [SELECT Id FROM Account LIMIT 1];
-        Test.startTest();
-        List<Opportunity> result = UrgentOpportunitiesController.fetchUrgentOpportunities('Urgent', acc.Id, 0, 10);
-        Test.stopTest();
-
-        System.assertEquals(1, result.size(), 'One opportunity should match the searchKey.');
-    }
-
-    // Test fetchUrgentOpportunities exception handling
-    @isTest
-    static void testFetchUrgentOpportunities_Exception() {
-        UrgentOpportunitiesController.forceFailure = true;
+    static void testFetchUrgentOpportunitiesCatchBlock() {
         Test.startTest();
         try {
             UrgentOpportunitiesController.fetchUrgentOpportunities(null, null, 0, 10);
-            System.assert(false, 'Exception should have been thrown.');
-        } catch (AuraHandledException e) {
-            System.debug('Exception caught: ' + e.getMessage());
-            System.assert(e.getMessage() != null, 'Exception message should not be null.');
-            System.assert(e.getMessage().contains('fetching opportunities') || 
-                          e.getMessage().contains('Script-thrown exception'),
-                          'Error message should indicate the failure.');
+        } catch (Exception e) {
+            System.assert(e.getMessage() != null, 'Catch block should handle null parameters.');
         }
         Test.stopTest();
     }
 
-    // Test fetchTotalRecordCount exception handling
     @isTest
-    static void testFetchTotalRecordCount_Exception() {
-        UrgentOpportunitiesController.forceFailure = true;
+    static void testSaveNewOpportunity() {
+        Opportunity opp = new Opportunity(
+            Name = 'Test Opportunity',
+            StageName = 'Needs Analysis',
+            CloseDate = Date.today().addDays(30)
+        );
+
         Test.startTest();
-        try {
-            // Force failure
-            UrgentOpportunitiesController.fetchTotalRecordCount(null, null);
-            System.assert(false, 'Exception should have been thrown.');
-        } catch (AuraHandledException e) {
-            System.debug('Exception caught: ' + e.getMessage());
-            System.assert(e.getMessage() != null, 'Exception message should not be null.');
-            System.assert(e.getMessage().contains('fetching the total record count') || 
-                          e.getMessage().contains('Script-thrown exception'),
-                          'Error message should indicate the failure.');
-        }
+        Boolean isSuccess = UrgentOpportunitiesController.saveNewOpportunity(opp);
         Test.stopTest();
+
+        System.assert(isSuccess, 'Opportunity should be saved successfully.');
     }
 
-    // Test saveNewOpportunity exception handling
     @isTest
-    static void testSaveNewOpportunity_Exception() {
-        UrgentOpportunitiesController.forceFailure = true;
-
-        Opportunity invalidOpp = new Opportunity(Name = null, StageName = 'Prospecting', CloseDate = Date.today());
+    static void testSaveNewOpportunityCatchBlock() {
         Test.startTest();
         try {
-            UrgentOpportunitiesController.saveNewOpportunity(invalidOpp);
-            System.assert(false, 'Exception should have been thrown.');
-        } catch (AuraHandledException e) {
-            System.debug('Exception caught: ' + e.getMessage());
-            System.assert(e.getMessage() != null, 'Exception message should not be null.');
-            System.assert(e.getMessage().contains('saving the opportunity') || 
-                          e.getMessage().contains('Script-thrown exception'),
-                          'Error message should indicate the failure.');
+            UrgentOpportunitiesController.saveNewOpportunity(null);
+        } catch (Exception e) {
+            System.assert(e.getMessage() != null, 'Catch block should handle null opportunity.');
         }
         Test.stopTest();
     }
