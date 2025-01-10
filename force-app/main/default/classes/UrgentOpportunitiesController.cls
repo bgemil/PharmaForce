@@ -35,27 +35,6 @@ public with sharing class UrgentOpportunitiesController {
         }
     }
 
-    @AuraEnabled(cacheable=true)
-    public static Integer fetchTotalRecordCount(String searchKey, Id accountId) {
-        try {
-            if (forceFailure) { 
-                throw new AuraHandledException('Simulated query failure');
-            }
-
-            String searchFilter = (searchKey == null) ? '%' : '%' + searchKey + '%';
-            return [
-                SELECT COUNT()
-                FROM Opportunity
-                WHERE Urgent__c = TRUE
-                AND AccountId = :accountId
-                AND Name LIKE :searchFilter
-            ];
-        } catch (Exception e) {
-            ErrorHandler.logError(e, 'UrgentOpportunitiesController', 'fetchTotalRecordCount', 'ERROR');
-            throw new AuraHandledException('An error occurred while fetching the total record count.');
-        }
-    }
-
     @AuraEnabled
     public static Boolean saveNewOpportunity(Opportunity opportunity) {
         Boolean isSuccess = true;
