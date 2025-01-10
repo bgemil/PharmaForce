@@ -81,7 +81,6 @@ export default class UrgentOpportunitiesTable extends LightningElement {
             };
         });
     
-        console.log('Pagination Map:', pages);
         return pages;
     }    
 
@@ -91,7 +90,6 @@ export default class UrgentOpportunitiesTable extends LightningElement {
 
     get totalPages() {
         const totalPages = Math.ceil(this.totalRecords / this.limitValue);
-        console.log('Total Pages:', totalPages);
         return totalPages;
     }
 
@@ -125,7 +123,7 @@ export default class UrgentOpportunitiesTable extends LightningElement {
         }
 
         saveNewOpportunity({ opportunity: newOpportunity })
-            .then(() => {
+            .then((result) => {
                 this.isModalOpen = false;
                 if(result) {
                     this.showToast('Success', 'New urgent opportunity created!', 'success');
