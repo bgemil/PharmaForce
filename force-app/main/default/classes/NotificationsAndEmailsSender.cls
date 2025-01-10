@@ -1,4 +1,71 @@
 public with sharing class NotificationsAndEmailsSender {
+    public static void processOpportunities(List<Opportunity> opportunities) {
+        try {
+            // Fetch notification type ID once
+            CustomNotificationType oppNotificationType = [ 
+                SELECT Id 
+                FROM CustomNotificationType 
+                WHERE DeveloperName = 'new_urgent_opportunity_notification'
+                LIMIT 1
+            ];
+
+            List<Messaging.SingleEmailMessage> emailMessages = new List<Messaging.SingleEmailMessage>();
+
+            for (Opportunity opportunity : opportunities) {
+                if (opportunity.Urgent__c == true) {
+                    Boolean isCreatorInTeam = false;
+
+                    if (opportunity.AccountId != null) {
+                        isCreatorInTeam = [
+                            SELECT Id 
+                            FROM AccountTeamMember 
+                            WHERE AccountId = :opportunity.AccountId AND UserId = :opportunity.CreatedById
+                            LIMIT 1
+                        ] != null;
+                    }
+
+                    // Notify creator
+                    if (isCreatorInTeam) {
+                        sendNotificationsAndEmails(
+                            opportunity,
+                            opportunity.CreatedById,
+                            true, // isCreator
+                            oppNotificationType.Id,
+                            emailMessages
+                        );
+                    }
+
+                    // Notify team members
+                    if (opportunity.AccountId != null) {
+                        List<AccountTeamMember> teamMembers = [
+                            SELECT UserId 
+                            FROM AccountTeamMember 
+                            WHERE AccountId = :opportunity.AccountId AND UserId != :opportunity.CreatedById
+                        ];
+
+                        for (AccountTeamMember member : teamMembers) {
+                            sendNotificationsAndEmails(
+                                opportunity,
+                                member.UserId,
+                                false, // isCreator
+                                oppNotificationType.Id,
+                                emailMessages
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Send all emails in bulk
+            if (!emailMessages.isEmpty()) {
+                Messaging.sendEmail(emailMessages);
+            }
+        } catch (Exception e) {
+            ErrorHandler.logError(e, 'NotificationsAndEmailsSender', 'processOpportunities', 'ERROR');
+            throw new AuraHandledException('Failed to process opportunities.');
+        }
+    }
+    
     public static void sendNotificationsAndEmails(Opportunity opportunity, Id recipientId, Boolean isCreator, String notificationTypeId, List<Messaging.SingleEmailMessage> emailMessages) {
         try {
             User recipient = [SELECT Email FROM User WHERE Id = :recipientId LIMIT 1];
